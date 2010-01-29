@@ -1,0 +1,5 @@
+libucimf (2.2.9.1-1) unstable; urgency=low
+
+  * Initial release (Closes: #567247)
+
+ -- Aron Xu <happyaron.xu@gmail.com>  Fri, 29 Jan 2010 15:54:32 +0800

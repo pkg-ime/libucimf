@@ -1,0 +1,40 @@
+Source: libucimf
+Section: utils
+Priority: optional
+Maintainer: IME Packaging Team <pkg-ime-devel@lists.alioth.debian.org>
+Uploaders: Aron Xu <happyaron.xu@gmail.com>
+Build-Depends: debhelper (>= 7.0.50~), autotools-dev, libncurses5-dev, libltdl7-dev, libfreetype6-dev, libmagic-dev, libmpfr-dev, libselinux1-dev, linux-libc-dev, pkg-config, quilt
+Standards-Version: 3.8.4
+Homepage: http://code.google.com/p/ucimf
+
+Package: libucimf-dev
+Section: libdevel
+Architecture: any
+Conflicts: libucimf-dev
+Depends: ${shlibs:Depends}, ${misc:Depends}, libucimf0 (= ${binary:Version})
+Description: unicode console input method framework
+ Provide an input method framework for Linux unicode
+ Framebuffer consle.
+ .
+ This package contains the developing header files.
+
+Package: libucimf0
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: unicode console input method framework
+ Provide an input method framework for Linux unicode
+ Framebuffer consle.
+ .
+ This package contains the runtime library.
+
+Package: ucimf
+Section: utils
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libucimf0, fbterm | jfbterm
+Recommends: fbterm-ucimf
+Description: uicode console input method framework
+ Provide an input method framework for Linux unicode
+ Framebuffer consle.
+ .
+ This package contains the application.

@@ -1,0 +1,7 @@
+version=3
+opts=downloadurlmangle=s#.*(libucimf-([\d.]+)\.tar\.gz).*#http://ucimf.googlecode.com/files/$1#,filenamemangle=s#.*(libucimf-([\d.]+)\.tar\.gz).*#$1# \
+    http://code.google.com/p/ucimf/downloads/list ^.*detail\?name=libucimf-([\d.]+)\.tar\.gz.*
+
+#http://code.google.com/p/ucimf/ \
+#http://ucimf.googlecode.com/files/libucimf-(.*)\.tar\.gz
+

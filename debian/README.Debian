@@ -1,0 +1,21 @@
+libucimf for Debian
+-------------------
+
+Binary package ucimf provides a script `/usr/bin/ucimf_start' which is 
+intended to be used to start the input method framework conveniently, 
+but fbterm in Debian is not setuid to root and without root privilage 
+users cannot use keyboard shortcut, the ucimf input method framework 
+commonly needs Ctrl-Space to start. So if the user wants to make this 
+script works well, it is required to set the script's mode to 6755 and 
+user/group to root/utmp. There is another way to start the program, to 
+install fbterm-ucimf package as well and run `fbterm -i fbterm_ucimf', 
+this is the recommended way introduced in the man pages because it avoids 
+security risks brought by setuid to root. But there are still some problems
+in Debian's fbterm package which caused the script mentioned at first 
+doesn't work even if setuid is done, and the second solution doesn't work
+without setuid, we will find a way to solve it soon. 
+Currently, we need to install the fbterm-ucimf package, set fbterm's mode 
+to 6755, and user/group to root/utmp, start fbterm with `fbterm -i 
+fbterm_ucimf' and press Ctrl+Space to activate the input method.
+
+ -- Aron Xu <happyaron.xu@gmail.com>  Fri, 29 Jan 2010 17:30:45 +0800
