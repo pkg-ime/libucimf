@@ -3,7 +3,7 @@ Section: utils
 Priority: optional
 Maintainer: IME Packaging Team <pkg-ime-devel@lists.alioth.debian.org>
 Uploaders: Aron Xu <happyaron.xu@gmail.com>
-Build-Depends: debhelper (>= 7.0.50~), autotools-dev, libncurses5-dev, libltdl7-dev, libfreetype6-dev, libmagic-dev, libmpfr-dev, libselinux1-dev, linux-libc-dev, pkg-config, quilt
+Build-Depends: debhelper (>= 7.0.50~), autotools-dev, libncurses5-dev, libltdl-dev, libfreetype6-dev, libmagic-dev, libmpfr-dev, pkg-config
 Standards-Version: 3.8.4
 Homepage: http://code.google.com/p/ucimf
 
