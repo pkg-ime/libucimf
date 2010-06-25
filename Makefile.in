@@ -17,8 +17,6 @@
 
 
 
-
-
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
@@ -38,10 +36,9 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = ucimf_keyboard$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(imfinclude_HEADERS) \
-	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(noinst_HEADERS) $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/config.h.in $(srcdir)/libucimf-uninstalled.pc.in \
 	$(srcdir)/libucimf.pc.in $(top_srcdir)/configure \
 	$(ucimfinclude_HEADERS) AUTHORS COPYING ChangeLog INSTALL NEWS \
@@ -78,41 +75,12 @@ am__nobase_list = $(am__nobase_strip_setup); \
 am__base_list = \
   sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
-am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
-	"$(DESTDIR)$(bindir)" "$(DESTDIR)$(confdir)" \
+am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(confdir)" \
 	"$(DESTDIR)$(miscdir)" "$(DESTDIR)$(pkgconfigdir)" \
 	"$(DESTDIR)$(imfincludedir)" "$(DESTDIR)$(ucimfincludedir)"
-LTLIBRARIES = $(lib_LTLIBRARIES)
-libucimf_la_DEPENDENCIES = $(top_builddir)/display/libdisplay.a
-am_libucimf_la_OBJECTS = libucimf_la-options.lo \
-	libucimf_la-graphdev.lo libucimf_la-font.lo \
-	libucimf_la-type.lo libucimf_la-graphport.lo \
-	libucimf_la-window.lo libucimf_la-widget.lo \
-	libucimf_la-shape.lo libucimf_la-cwm.lo libucimf_la-ucimf.lo
-libucimf_la_OBJECTS = $(am_libucimf_la_OBJECTS)
-libucimf_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(libucimf_la_LDFLAGS) $(LDFLAGS) -o $@
-PROGRAMS = $(bin_PROGRAMS)
-am_ucimf_keyboard_OBJECTS = ucimf_keyboard.$(OBJEXT)
-ucimf_keyboard_OBJECTS = $(am_ucimf_keyboard_OBJECTS)
-ucimf_keyboard_LDADD = $(LDADD)
 SCRIPTS = $(bin_SCRIPTS)
-DEFAULT_INCLUDES = -I.@am__isrc@
-depcomp = $(SHELL) $(top_srcdir)/depcomp
-am__depfiles_maybe = depfiles
-am__mv = mv -f
-CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
-LTCXXCOMPILE = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
-CXXLD = $(CXX)
-CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
-SOURCES = $(libucimf_la_SOURCES) $(ucimf_keyboard_SOURCES)
-DIST_SOURCES = $(libucimf_la_SOURCES) $(ucimf_keyboard_SOURCES)
+SOURCES =
+DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -121,7 +89,8 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	installcheck-recursive installdirs-recursive pdf-recursive \
 	ps-recursive uninstall-recursive
 DATA = $(conf_DATA) $(misc_DATA) $(pkgconfig_DATA)
-HEADERS = $(imfinclude_HEADERS) $(ucimfinclude_HEADERS)
+HEADERS = $(imfinclude_HEADERS) $(noinst_HEADERS) \
+	$(ucimfinclude_HEADERS)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 AM_RECURSIVE_TARGETS = $(RECURSIVE_TARGETS:-recursive=) \
@@ -220,8 +189,10 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
+PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PKG_CONFIG = @PKG_CONFIG@
 RANLIB = @RANLIB@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
@@ -252,6 +223,10 @@ datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
 exec_prefix = @exec_prefix@
+fontconfig_CFLAGS = @fontconfig_CFLAGS@
+fontconfig_LIBS = @fontconfig_LIBS@
+freetype2_CFLAGS = @freetype2_CFLAGS@
+freetype2_LIBS = @freetype2_LIBS@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
@@ -281,37 +256,26 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = display 
+SUBDIRS = display font src #fbterm_ucimf
 AM_CPPFLAGS = -g -DDEBUG 
 ucimfinclude_HEADERS = include/ucimf.h
 ucimfincludedir = $(includedir)
 imfinclude_HEADERS = include/imf/graphport.h include/imf/imf.h include/imf/type.h include/imf/widget.h include/imf/window.h
 imfincludedir = $(includedir)/imf/
-lib_LTLIBRARIES = libucimf.la
-libucimf_la_SOURCES = options.cpp \
-                        graphdev.cpp font.cpp \
-			type.cpp graphport.cpp \
-			window.cpp widget.cpp shape.cpp cwm.cpp \
-			ucimf.cpp
-
-libucimf_la_CPPFLAGS = -I$(top_srcdir) -I$(top_srcdir)/include -I$(top_srcdir)/include/imf `pkg-config --cflags freetype2`
-libucimf_la_LDFLAGS = -lltdl `pkg-config --libs freetype2`
-libucimf_la_LIBADD = $(top_builddir)/display/libdisplay.a
-ucimf_keyboard_SOURCES = ucimf_keyboard.cpp
-bin_SCRIPTS = ucimf_start
+noinst_HEADERS = include/debug.h
+bin_SCRIPTS = ucimf_start ucimf_keyboard
 confdir = $(sysconfdir)
 conf_DATA = ucimf.conf 
 miscdir = $(datadir)/ucimf/
-misc_DATA = fonts/unifont.pcf ucimf.conf.example
+misc_DATA = ucimf.conf.example
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libucimf.pc libucimf-uninstalled.pc
 pkgconfig_in_data = libucimf.pc.in libucimf-uninstalled.pc.in
-EXTRA_DIST = ucimf_start cwm.h font.h graphdev.h shape.h options.h ucimf.conf ucimf.conf.example fonts/unifont.pcf debug.h $(pkgconfig_DATA) $(pkgconfig_in_data)
+EXTRA_DIST = $(bin_SCRIPTS) $(conf_DATA) $(misc_DATA) $(pkgconfig_DATA) $(pkgconfig_in_data)
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .cpp .lo .o .obj
 am--refresh:
 	@:
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -367,85 +331,6 @@ libucimf-uninstalled.pc: $(top_builddir)/config.status $(srcdir)/libucimf-uninst
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 libucimf.pc: $(top_builddir)/config.status $(srcdir)/libucimf.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
-install-libLTLIBRARIES: $(lib_LTLIBRARIES)
-	@$(NORMAL_INSTALL)
-	test -z "$(libdir)" || $(MKDIR_P) "$(DESTDIR)$(libdir)"
-	@list='$(lib_LTLIBRARIES)'; test -n "$(libdir)" || list=; \
-	list2=; for p in $$list; do \
-	  if test -f $$p; then \
-	    list2="$$list2 $$p"; \
-	  else :; fi; \
-	done; \
-	test -z "$$list2" || { \
-	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(DESTDIR)$(libdir)'"; \
-	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(DESTDIR)$(libdir)"; \
-	}
-
-uninstall-libLTLIBRARIES:
-	@$(NORMAL_UNINSTALL)
-	@list='$(lib_LTLIBRARIES)'; test -n "$(libdir)" || list=; \
-	for p in $$list; do \
-	  $(am__strip_dir) \
-	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f '$(DESTDIR)$(libdir)/$$f'"; \
-	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f "$(DESTDIR)$(libdir)/$$f"; \
-	done
-
-clean-libLTLIBRARIES:
-	-test -z "$(lib_LTLIBRARIES)" || rm -f $(lib_LTLIBRARIES)
-	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
-	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
-	  test "$$dir" != "$$p" || dir=.; \
-	  echo "rm -f \"$${dir}/so_locations\""; \
-	  rm -f "$${dir}/so_locations"; \
-	done
-libucimf.la: $(libucimf_la_OBJECTS) $(libucimf_la_DEPENDENCIES) 
-	$(libucimf_la_LINK) -rpath $(libdir) $(libucimf_la_OBJECTS) $(libucimf_la_LIBADD) $(LIBS)
-install-binPROGRAMS: $(bin_PROGRAMS)
-	@$(NORMAL_INSTALL)
-	test -z "$(bindir)" || $(MKDIR_P) "$(DESTDIR)$(bindir)"
-	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
-	for p in $$list; do echo "$$p $$p"; done | \
-	sed 's/$(EXEEXT)$$//' | \
-	while read p p1; do if test -f $$p || test -f $$p1; \
-	  then echo "$$p"; echo "$$p"; else :; fi; \
-	done | \
-	sed -e 'p;s,.*/,,;n;h' -e 's|.*|.|' \
-	    -e 'p;x;s,.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/' | \
-	sed 'N;N;N;s,\n, ,g' | \
-	$(AWK) 'BEGIN { files["."] = ""; dirs["."] = 1 } \
-	  { d=$$3; if (dirs[d] != 1) { print "d", d; dirs[d] = 1 } \
-	    if ($$2 == $$4) files[d] = files[d] " " $$1; \
-	    else { print "f", $$3 "/" $$4, $$1; } } \
-	  END { for (d in files) print "f", d, files[d] }' | \
-	while read type dir files; do \
-	    if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
-	    test -z "$$files" || { \
-	    echo " $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $$files '$(DESTDIR)$(bindir)$$dir'"; \
-	    $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $$files "$(DESTDIR)$(bindir)$$dir" || exit $$?; \
-	    } \
-	; done
-
-uninstall-binPROGRAMS:
-	@$(NORMAL_UNINSTALL)
-	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
-	files=`for p in $$list; do echo "$$p"; done | \
-	  sed -e 'h;s,^.*/,,;s/$(EXEEXT)$$//;$(transform)' \
-	      -e 's/$$/$(EXEEXT)/' `; \
-	test -n "$$list" || exit 0; \
-	echo " ( cd '$(DESTDIR)$(bindir)' && rm -f" $$files ")"; \
-	cd "$(DESTDIR)$(bindir)" && rm -f $$files
-
-clean-binPROGRAMS:
-	@list='$(bin_PROGRAMS)'; test -n "$$list" || exit 0; \
-	echo " rm -f" $$list; \
-	rm -f $$list || exit $$?; \
-	test -n "$(EXEEXT)" || exit 0; \
-	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
-	echo " rm -f" $$list; \
-	rm -f $$list
-ucimf_keyboard$(EXEEXT): $(ucimf_keyboard_OBJECTS) $(ucimf_keyboard_DEPENDENCIES) 
-	@rm -f ucimf_keyboard$(EXEEXT)
-	$(CXXLINK) $(ucimf_keyboard_OBJECTS) $(ucimf_keyboard_LDADD) $(LIBS)
 install-binSCRIPTS: $(bin_SCRIPTS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(MKDIR_P) "$(DESTDIR)$(bindir)"
@@ -480,115 +365,6 @@ uninstall-binSCRIPTS:
 	test -n "$$list" || exit 0; \
 	echo " ( cd '$(DESTDIR)$(bindir)' && rm -f" $$files ")"; \
 	cd "$(DESTDIR)$(bindir)" && rm -f $$files
-
-mostlyclean-compile:
-	-rm -f *.$(OBJEXT)
-
-distclean-compile:
-	-rm -f *.tab.c
-
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libucimf_la-cwm.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libucimf_la-font.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libucimf_la-graphdev.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libucimf_la-graphport.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libucimf_la-options.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libucimf_la-shape.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libucimf_la-type.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libucimf_la-ucimf.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libucimf_la-widget.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libucimf_la-window.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ucimf_keyboard.Po@am__quote@
-
-.cpp.o:
-@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ $<
-
-.cpp.obj:
-@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-.cpp.lo:
-@am__fastdepCXX_TRUE@	$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
-
-libucimf_la-options.lo: options.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libucimf_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libucimf_la-options.lo -MD -MP -MF $(DEPDIR)/libucimf_la-options.Tpo -c -o libucimf_la-options.lo `test -f 'options.cpp' || echo '$(srcdir)/'`options.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libucimf_la-options.Tpo $(DEPDIR)/libucimf_la-options.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='options.cpp' object='libucimf_la-options.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libucimf_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libucimf_la-options.lo `test -f 'options.cpp' || echo '$(srcdir)/'`options.cpp
-
-libucimf_la-graphdev.lo: graphdev.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libucimf_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libucimf_la-graphdev.lo -MD -MP -MF $(DEPDIR)/libucimf_la-graphdev.Tpo -c -o libucimf_la-graphdev.lo `test -f 'graphdev.cpp' || echo '$(srcdir)/'`graphdev.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libucimf_la-graphdev.Tpo $(DEPDIR)/libucimf_la-graphdev.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='graphdev.cpp' object='libucimf_la-graphdev.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libucimf_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libucimf_la-graphdev.lo `test -f 'graphdev.cpp' || echo '$(srcdir)/'`graphdev.cpp
-
-libucimf_la-font.lo: font.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libucimf_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libucimf_la-font.lo -MD -MP -MF $(DEPDIR)/libucimf_la-font.Tpo -c -o libucimf_la-font.lo `test -f 'font.cpp' || echo '$(srcdir)/'`font.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libucimf_la-font.Tpo $(DEPDIR)/libucimf_la-font.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='font.cpp' object='libucimf_la-font.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libucimf_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libucimf_la-font.lo `test -f 'font.cpp' || echo '$(srcdir)/'`font.cpp
-
-libucimf_la-type.lo: type.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libucimf_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libucimf_la-type.lo -MD -MP -MF $(DEPDIR)/libucimf_la-type.Tpo -c -o libucimf_la-type.lo `test -f 'type.cpp' || echo '$(srcdir)/'`type.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libucimf_la-type.Tpo $(DEPDIR)/libucimf_la-type.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='type.cpp' object='libucimf_la-type.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libucimf_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libucimf_la-type.lo `test -f 'type.cpp' || echo '$(srcdir)/'`type.cpp
-
-libucimf_la-graphport.lo: graphport.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libucimf_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libucimf_la-graphport.lo -MD -MP -MF $(DEPDIR)/libucimf_la-graphport.Tpo -c -o libucimf_la-graphport.lo `test -f 'graphport.cpp' || echo '$(srcdir)/'`graphport.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libucimf_la-graphport.Tpo $(DEPDIR)/libucimf_la-graphport.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='graphport.cpp' object='libucimf_la-graphport.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libucimf_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libucimf_la-graphport.lo `test -f 'graphport.cpp' || echo '$(srcdir)/'`graphport.cpp
-
-libucimf_la-window.lo: window.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libucimf_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libucimf_la-window.lo -MD -MP -MF $(DEPDIR)/libucimf_la-window.Tpo -c -o libucimf_la-window.lo `test -f 'window.cpp' || echo '$(srcdir)/'`window.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libucimf_la-window.Tpo $(DEPDIR)/libucimf_la-window.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='window.cpp' object='libucimf_la-window.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libucimf_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libucimf_la-window.lo `test -f 'window.cpp' || echo '$(srcdir)/'`window.cpp
-
-libucimf_la-widget.lo: widget.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libucimf_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libucimf_la-widget.lo -MD -MP -MF $(DEPDIR)/libucimf_la-widget.Tpo -c -o libucimf_la-widget.lo `test -f 'widget.cpp' || echo '$(srcdir)/'`widget.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libucimf_la-widget.Tpo $(DEPDIR)/libucimf_la-widget.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='widget.cpp' object='libucimf_la-widget.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libucimf_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libucimf_la-widget.lo `test -f 'widget.cpp' || echo '$(srcdir)/'`widget.cpp
-
-libucimf_la-shape.lo: shape.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libucimf_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libucimf_la-shape.lo -MD -MP -MF $(DEPDIR)/libucimf_la-shape.Tpo -c -o libucimf_la-shape.lo `test -f 'shape.cpp' || echo '$(srcdir)/'`shape.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libucimf_la-shape.Tpo $(DEPDIR)/libucimf_la-shape.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='shape.cpp' object='libucimf_la-shape.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libucimf_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libucimf_la-shape.lo `test -f 'shape.cpp' || echo '$(srcdir)/'`shape.cpp
-
-libucimf_la-cwm.lo: cwm.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libucimf_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libucimf_la-cwm.lo -MD -MP -MF $(DEPDIR)/libucimf_la-cwm.Tpo -c -o libucimf_la-cwm.lo `test -f 'cwm.cpp' || echo '$(srcdir)/'`cwm.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libucimf_la-cwm.Tpo $(DEPDIR)/libucimf_la-cwm.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='cwm.cpp' object='libucimf_la-cwm.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libucimf_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libucimf_la-cwm.lo `test -f 'cwm.cpp' || echo '$(srcdir)/'`cwm.cpp
-
-libucimf_la-ucimf.lo: ucimf.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libucimf_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libucimf_la-ucimf.lo -MD -MP -MF $(DEPDIR)/libucimf_la-ucimf.Tpo -c -o libucimf_la-ucimf.lo `test -f 'ucimf.cpp' || echo '$(srcdir)/'`ucimf.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libucimf_la-ucimf.Tpo $(DEPDIR)/libucimf_la-ucimf.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ucimf.cpp' object='libucimf_la-ucimf.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libucimf_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libucimf_la-ucimf.lo `test -f 'ucimf.cpp' || echo '$(srcdir)/'`ucimf.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -1011,13 +787,10 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(SCRIPTS) $(DATA) \
-		$(HEADERS) config.h
-install-binPROGRAMS: install-libLTLIBRARIES
-
+all-am: Makefile $(SCRIPTS) $(DATA) $(HEADERS) config.h
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(confdir)" "$(DESTDIR)$(miscdir)" "$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(imfincludedir)" "$(DESTDIR)$(ucimfincludedir)"; do \
+	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(confdir)" "$(DESTDIR)$(miscdir)" "$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(imfincludedir)" "$(DESTDIR)$(ucimfincludedir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-recursive
@@ -1047,15 +820,13 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-clean-am: clean-binPROGRAMS clean-generic clean-libLTLIBRARIES \
-	clean-libtool mostlyclean-am
+clean-am: clean-generic clean-libtool mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
-distclean-am: clean-am distclean-compile distclean-generic \
-	distclean-hdr distclean-libtool distclean-tags
+distclean-am: clean-am distclean-generic distclean-hdr \
+	distclean-libtool distclean-tags
 
 dvi: dvi-recursive
 
@@ -1077,10 +848,8 @@ install-dvi: install-dvi-recursive
 
 install-dvi-am:
 
-install-exec-am: install-binPROGRAMS install-binSCRIPTS \
-	install-libLTLIBRARIES
-	@$(NORMAL_INSTALL)
-	$(MAKE) $(AM_MAKEFLAGS) install-exec-hook
+install-exec-am: install-binSCRIPTS
+
 install-html: install-html-recursive
 
 install-html-am:
@@ -1104,14 +873,12 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-recursive
 
-mostlyclean-am: mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool
+mostlyclean-am: mostlyclean-generic mostlyclean-libtool
 
 pdf: pdf-recursive
 
@@ -1121,44 +888,34 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-binSCRIPTS \
-	uninstall-confDATA uninstall-imfincludeHEADERS \
-	uninstall-libLTLIBRARIES uninstall-miscDATA \
+uninstall-am: uninstall-binSCRIPTS uninstall-confDATA \
+	uninstall-imfincludeHEADERS uninstall-miscDATA \
 	uninstall-pkgconfigDATA uninstall-ucimfincludeHEADERS
 
 .MAKE: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) all \
-	ctags-recursive install-am install-exec-am install-strip \
-	tags-recursive
+	ctags-recursive install-am install-strip tags-recursive
 
 .PHONY: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) CTAGS GTAGS \
-	all all-am am--refresh check check-am clean clean-binPROGRAMS \
-	clean-generic clean-libLTLIBRARIES clean-libtool ctags \
-	ctags-recursive dist dist-all dist-bzip2 dist-gzip dist-lzma \
-	dist-shar dist-tarZ dist-xz dist-zip distcheck distclean \
-	distclean-compile distclean-generic distclean-hdr \
+	all all-am am--refresh check check-am clean clean-generic \
+	clean-libtool ctags ctags-recursive dist dist-all dist-bzip2 \
+	dist-gzip dist-lzma dist-shar dist-tarZ dist-xz dist-zip \
+	distcheck distclean distclean-generic distclean-hdr \
 	distclean-libtool distclean-tags distcleancheck distdir \
 	distuninstallcheck dvi dvi-am html html-am info info-am \
-	install install-am install-binPROGRAMS install-binSCRIPTS \
-	install-confDATA install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-exec-hook \
-	install-html install-html-am install-imfincludeHEADERS \
-	install-info install-info-am install-libLTLIBRARIES \
+	install install-am install-binSCRIPTS install-confDATA \
+	install-data install-data-am install-dvi install-dvi-am \
+	install-exec install-exec-am install-html install-html-am \
+	install-imfincludeHEADERS install-info install-info-am \
 	install-man install-miscDATA install-pdf install-pdf-am \
 	install-pkgconfigDATA install-ps install-ps-am install-strip \
 	install-ucimfincludeHEADERS installcheck installcheck-am \
 	installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags tags-recursive uninstall uninstall-am \
-	uninstall-binPROGRAMS uninstall-binSCRIPTS uninstall-confDATA \
-	uninstall-imfincludeHEADERS uninstall-libLTLIBRARIES \
-	uninstall-miscDATA uninstall-pkgconfigDATA \
-	uninstall-ucimfincludeHEADERS
+	maintainer-clean-generic mostlyclean mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-recursive \
+	uninstall uninstall-am uninstall-binSCRIPTS uninstall-confDATA \
+	uninstall-imfincludeHEADERS uninstall-miscDATA \
+	uninstall-pkgconfigDATA uninstall-ucimfincludeHEADERS
 
-
-install-exec-hook:
-	chown root:utmp $(DESTDIR)$(bindir)/ucimf_start || echo "Change ownership failed..."
-	chmod ug+s $(DESTDIR)$(bindir)/ucimf_start
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

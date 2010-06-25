@@ -20,11 +20,12 @@
 
 #ifndef GRPATHDEV_H
 #define GRPATHDEV_H
-#if defined(linux)
-    #include <asm/types.h>
-#elif defined(__FreeBSD__)
-    #include "utypes.h"
-#endif
+
+typedef unsigned char __u8;
+typedef unsigned short __u16;
+typedef unsigned int __u32;
+typedef unsigned long long __u64;
+
 #include <stdexcept>
 
 struct CharBitMap {
@@ -55,12 +56,6 @@ class GraphDev {
         // font
         int OutChar(int x, int y, int fg, int bg, unsigned int c);
 
-        // char display
-        virtual void DrawChar(int x,int y,int fg,int bg,struct CharBitMap* pFont) = 0;
-        static int BlockHeight() { return mBlockHeight; }
-        static int BlockWidth() { return mBlockWidth; }
-        static int mBlankLineHeight;
-
         void ClearScr();
         void DrawLine(int x1,int y1,int x2,int y2,int color);
         void DrawRect(int x1,int y1,int x2,int y2,int color);
@@ -73,8 +68,6 @@ class GraphDev {
         
     protected:
         static int mXres, mYres;
-        static int mBlockWidth;
-        static int mBlockHeight;
 };
 
 #define fb_readb(addr) (*(volatile __u8 *) (addr))

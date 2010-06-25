@@ -22,6 +22,7 @@
 #include "graphport.h"
 #include "type.h"
 #include "graphdev.h"
+#include "font.h"
 
 void Rect::draw( GraphPort* gp)
 {
@@ -39,8 +40,10 @@ Text::Text()
 {
   height = width = 0;
   color_fg = color_bg = 0;
-  font_width = GraphDev::BlockWidth();
-  font_height = GraphDev::BlockHeight();
+
+  Font* font = Font::instance();
+  font_width = font->width();
+  font_height = font->height();
   data.clear();
 }
 
@@ -59,7 +62,23 @@ void Text::append( const ustring& ustr )
   
   height = font_height * data.size();
   
-  int new_length = new_str.length();
+  int new_length = 0; 
+
+  // Calculate new str's size
+  Font* font = Font::instance();
+  for( size_t i=0; i< new_str.size(); i++ )
+  {
+    //new_length += font->length( new_str[i] );
+    Font::Glyph *glyph = font->getGlyph( new_str[i] );
+
+    if( !glyph ){                                                                                   
+	    new_length += font->width();
+    }  
+    else{
+	    int delta = glyph->width > font->width()/2 ? glyph->width : font->width()/2 ;
+	    new_length += delta + glyph->left;
+    }
+  }
   
   if( new_length > width )
   {
@@ -74,7 +93,22 @@ void Text::append_next( const ustring& ustr )
   
   height = font_height * data.size();
 
-  int new_length = ustr.length();
+  int new_length = 0;
+  // Calculate new str's size
+  Font* font = Font::instance();
+  for( size_t i=0; i< ustr.size(); i++ )
+  {
+    //new_length += font->length( ustr[i] );
+    Font::Glyph *glyph = font->getGlyph( ustr[i] );
+    if( !glyph ){                                                                                   
+	    new_length += font->width();
+    }  
+    else{
+	    int delta = glyph->width > font->width()/2 ? glyph->width : font->width()/2 ;
+	    new_length += delta + glyph->left;
+    }
+  }
+
   if( new_length > width )
   {
     width = new_length;

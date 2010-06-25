@@ -1,3 +1,9 @@
+libucimf (2.3.5-1) unstable; urgency=low
+
+   * Upstream new release, with a lot of bug fixes and new features. 
+
+ -- Aron Xu <happyaron.xu@gmail.com>  Fri, 25 Jun 2010 20:13:22 +0800
+
 libucimf (2.2.9.1-2) unstable; urgency=low
 
   * Make it build on kfreebsd-* archs.
