@@ -27,6 +27,11 @@ Files: debian/*
 Copyright: 2010, Aron Xu <happyaron.xu@gmail.com>
 License: GPL-2+
 
+Files: font/font.cpp, font/font.h
+Copyright: 2008-2009 dragchan <zgchan317@gmail.com>
+           2010 Chun-Yu Lee (Mat) <matlinuxer2@gmail.com> 
+License: GPL-2+
+
 Files: display/*
 Copyright: 2007 Chun-Yu Lee (Mat) and Open RazzmatazZ Laboratory (OrzLab)
           Parts taken from zhcon project:
@@ -42,37 +47,17 @@ Files: display/limr.c,
 display/limr.h.
 Copyright: 1998 Josh Vanderhoof
 License: 
+   Linux Real Mode Interface - A library of DPMI-like functions for Linux.
 
-Linux Real Mode Interface - A library of DPMI-like functions for Linux.
+   Copyright (C) 1998 by Josh Vanderhoof
 
-Copyright (C) 1998 by Josh Vanderhoof
+   You are free to distribute and modify this file, as long as you
+   do not remove this copyright notice and clearly label modified
+   versions as being modified.
 
-You are free to distribute and modify this file, as long as you
-do not remove this copyright notice and clearly label modified
-versions as being modified.
+   This software has NO WARRANTY.  Use it at your own risk.
 
-This software has NO WARRANTY.  Use it at your own risk.
-
-Files: fonts/unifont.pcf
-Copyright: Original unifont.hex and Perl scripts:
-              (c) 1998-2003 Roman Czyborra;
-           Unibit and Wen Quan Yi glyphs:
-              (c) 2004-2008 Qianqian Fang and the Wen Quan Yi Board
-                  of Trustees;
-           Shell, Perl, & FontForge scripts for converting unifont.hex
-              into TrueType:
-              (c) 2005-2008 Luis Gonzalez Miranda;
-           Additions to complete Unicode 5.1 Plane 0, C programs,
-              modifications to original programs, & GNU/Linux packaging:
-              (c) 2007-2008 Paul Hardy
-           Mods to debian/ directory and Makefiles for Debian packaging:
-              (c) 2008 Anthony Fok & Paul Hardy
-           Hangul Syllables glyphs (U+AC00..U+D7A3):
-              (c) 1986-2002 Jeong-Hwan Kim
-
-License: GPL-2+
-
-Files: include/imf/imf.h
+Files: include/imf/imf.h, sample/imf/*
 Copyright: 2006-2007 Chun-Yu Lee (Mat) and Open RazzmatazZ Laboratory (OrzLab)
 License: 
    Redistribution and use in source and binary forms, with or without

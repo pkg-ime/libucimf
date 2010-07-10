@@ -1,11 +1,11 @@
-prefix=/usr/local
-exec_prefix=/usr/local
+prefix=/home/mat/Kinder/ucimf/scripts//_build
+exec_prefix=/home/mat/Kinder/ucimf/scripts//_build
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
 
 Name: libucimf
 Description: UCIMF (http://ucimf.sourceforge.net ) is a toolkit framework for input method under unicode console environment.
-Version: 2.3.5
-Requires: freetype 
+Version: 2.3.7
+Requires: freetype2 fontconfig
 Libs: -L${libdir} -lucimf
 Cflags: -I${includedir}

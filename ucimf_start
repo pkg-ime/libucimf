@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# TODO: ucimf_start => ucimf_start.in
+
 UCIMF_CONF="${HOME}/.ucimf.conf"
 UCIMF_LOG="${HOME}/.ucimf-log" 
 OPENVANILLA_MODULES_DIR="${HOME}/.openvanilla/OVIMGeneric/"
@@ -43,34 +45,40 @@ function env_check(){
 
 	# check /dev/fb0 existence and permission
 	local my_fb_dev=$( ls /dev/fb* | head -n 1 )
-	local my_fb_perm=$( ls -l $my_fb_dev | cut -c-24  )
+	local my_fb_perm=$( ls -l $my_fb_dev | cut -c-23  )
         local my_fb_bits=$( cat /sys/class/graphics/$(basename $my_fb_dev)/bits_per_pixel)
         local my_fb_size=$( cat /sys/class/graphics/$(basename $my_fb_dev)/virtual_size)
+
+	# check fbterm permission
+	local fbterm_perm=$( ls -l $(which fbterm) | cut -c-23 )
+	local fbterm_getcap=$( /sbin/getcap $(which fbterm) | grep fbterm | cut -f2 -d= )
 
 	# check openvanilla's modules existed
 	local my_openvanilla_modules=$( ls -l ${OPENVANILLA_MODULES_DIR} )
 
-	echo "" 
+	echo 
 	echo "            tty: ${my_tty}" 
 	echo "      fb device: ${my_fb_dev}" 
 	echo "  fb permission: ${my_fb_perm}" 
 	echo " bits per pixel: ${my_fb_bits}" 
 	echo "        fb size: ${my_fb_size}" 
-	echo "" 
+	echo 
 	echo "      conf file: ${UCIMF_CONF}" 
 	echo "       log file: ${UCIMF_LOG}"
-	echo "" 
+	echo 
 	echo "           term: ${THE_TERM}"
-	echo "" 
+	echo "    fbterm perm: ${fbterm_perm}"
+	echo "  fbterm getcap: ${fbterm_getcap}"
+	echo 
 	echo "           font: ${THE_FONT}"
 	echo "      font-size: ${THE_FONTSIZE}"
-	echo "" 
+	echo 
 	echo "         locale: ${LC_CTYPE}" 
 	echo "  config locale: ${THE_LOCALE}" 
-	echo "" 
+	echo 
 	echo "        ime dir: ${OPENVANILLA_MODULES_DIR}" 
 	echo "     ime tables: ${THE_IME}"
-	echo "" 
+	echo 
 }
 
 function main_setup(){
@@ -83,7 +91,7 @@ function main_setup(){
 	"ime"         "Input Method Engines (IME) setup" \
 	"font"        "Fonts settings" \
 	"fontsize"    "Fonts size settings" \
-	"run"         "Save and prepare to run program" \
+	"done"         "Save and prepare to run program" \
 	| xargs echo
 }
 
@@ -249,7 +257,7 @@ function ime_setup(){
 	THE_IME="$result"
 
 	echo "Updating ime tables..."
-	echo ""
+	echo
 	install -d $my_imes_dir
 
 	# 將選定的項目打開
@@ -293,11 +301,17 @@ function ime_setup(){
 	    fi
 	done
 
-	echo ""
+	echo
 	read -p "Press <Enter> to continue..."
 }
 
 function show_font_list(){
+
+	if [ "x$THE_FONT" != "x" ] ; then
+            echo "\"$THE_FONT\" \"$THE_FONT\" on"
+        fi
+	
+	THE_FONT="$result"
 	IFS=$'\n'
         for line in $(fc-list)
         do
@@ -352,7 +366,7 @@ while true; do
     main)
       CMD=$(main_setup) # 回主選單
       ;;
-    run)
+    done)
       echo -n "Saving settings...."
       save_setup
       sleep 0.5
@@ -362,9 +376,9 @@ while true; do
       sleep 0.5 
       env_check
 
-      echo "" 
+      echo
       echo "To start using, just execute following command:" 
-      echo "" 
+      echo
 
       if [ "x$THE_TERM" == "xfbterm" ]
       then
@@ -374,7 +388,7 @@ while true; do
 	      echo "    LC_CTYPE=\"$THE_LOCALE\" $THE_TERM 2>/dev/null"
       fi
 
-      echo "" 
+      echo 
       echo "Enjoy it! :-)" 
       
       exit 0

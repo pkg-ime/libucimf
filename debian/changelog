@@ -1,3 +1,22 @@
+libucimf (2.3.7-1) unstable; urgency=low
+
+  * New upstream release:
+      Fixing build failures on ia64 and sparc,
+      Tuning Makefile and scripts,
+      More features added.
+  * Update manpages:
+      Fixing the hyphen-used-as-minus-sign,
+      Fixing two typos.
+  * debian/control: 
+      Bump std-ver to 3.9.0,
+      Add fbterm (>= 1.5) requirement to binary package ucimf,
+      Remove duplicate section info,
+      Fixing duplicate-short-description.
+  * debian/docs: Remove empty NEWS from it.
+  * debian/copyright: Update copyright info.
+
+ -- Aron Xu <happyaron.xu@gmail.com>  Sat, 10 Jul 2010 18:55:22 +0800
+
 libucimf (2.3.5-1) unstable; urgency=low
 
    * Upstream new release, with a lot of bug fixes and new features. 

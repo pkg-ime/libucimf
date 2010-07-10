@@ -2,3 +2,5 @@ usr/include/ucimf.h
 usr/include/imf/*
 usr/lib/pkgconfig/*
 usr/lib/libucimf.so
+usr/lib/libucimf.a
+usr/lib/libucimf.la

@@ -2,3 +2,4 @@ usr/bin/ucimf_keyboard
 usr/bin/ucimf_start
 etc/ucimf.conf etc/
 usr/share/ucimf/ucimf.conf.example
+usr/lib/ucimf/
