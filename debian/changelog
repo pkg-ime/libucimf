@@ -1,3 +1,12 @@
+libucimf (2.3.7-2) unstable; urgency=low
+
+  * debian/control:
+      Bump std-ver to 3.9.1,
+      Remove Build-Depends on libmpfr-dev,
+      Add Vcs-Bzr and Vcs-Browser fields.
+
+ -- Aron Xu <happyaron.xu@gmail.com>  Wed, 08 Sep 2010 10:16:00 +0800
+
 libucimf (2.3.7-1) unstable; urgency=low
 
   * New upstream release:
