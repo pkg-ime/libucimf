@@ -1,3 +1,21 @@
+libucimf (2.3.8-1) unstable; urgency=low
+
+  * New upstream release:
+    + Can detect multiple input methods when installed.
+  * debian/control:
+    + Add DMUA
+    + Add "dialog" to Recommends of ucimf package.
+  * debian/*.1:
+    - Removed, merged upstream.
+  * debian/ucimf.manpages:
+    - Change accordingly.
+  * debian/ucimf.examples:
+    + Enlist examples.
+  * debian/ucimf.install:
+    - Remove items that not needed any more.
+
+ -- Aron Xu <happyaron.xu@gmail.com>  Tue, 22 Feb 2011 03:27:00 +0800
+
 libucimf (2.3.7-2) unstable; urgency=low
 
   * debian/control:

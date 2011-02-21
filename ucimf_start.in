@@ -3,10 +3,10 @@
 UCIMF_CONF="${HOME}/.ucimf.conf"
 UCIMF_LOG="${HOME}/.ucimf-log" 
 OPENVANILLA_MODULES_DIR="${HOME}/.openvanilla/OVIMGeneric/"
-prefix=/home/mat/Kinder/ucimf/scripts//_build
-exec_prefix=/home/mat/Kinder/ucimf/scripts//_build
-OPENVANILLA_MODULES_DIR_SYS="${exec_prefix}/lib/openvanilla/OVIMGeneric/"
-OPENVANILLA_MODULES_DIR_SYS2="${prefix}/share/openvanilla/OVIMGeneric/"
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+OPENVANILLA_MODULES_DIR_SYS="@libdir@/openvanilla/OVIMGeneric/"
+OPENVANILLA_MODULES_DIR_SYS2="@datadir@/openvanilla/OVIMGeneric/"
 
 #
 # functions in planing

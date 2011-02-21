@@ -1,2 +1,2 @@
-debian/*.1
-debian/*.5
+./man/*.1
+./man/*.5

@@ -40,10 +40,10 @@ subdir = .
 DIST_COMMON = README $(am__configure_deps) $(imfinclude_HEADERS) \
 	$(noinst_HEADERS) $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/config.h.in $(srcdir)/libucimf-uninstalled.pc.in \
-	$(srcdir)/libucimf.pc.in $(top_srcdir)/configure \
-	$(ucimfinclude_HEADERS) AUTHORS COPYING ChangeLog INSTALL NEWS \
-	TODO compile config.guess config.sub depcomp install-sh \
-	ltmain.sh missing
+	$(srcdir)/libucimf.pc.in $(srcdir)/ucimf_start.in \
+	$(top_srcdir)/configure $(ucimfinclude_HEADERS) AUTHORS \
+	COPYING ChangeLog INSTALL NEWS TODO compile config.guess \
+	config.sub depcomp install-sh ltmain.sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -52,7 +52,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h
-CONFIG_CLEAN_FILES = libucimf-uninstalled.pc libucimf.pc
+CONFIG_CLEAN_FILES = libucimf-uninstalled.pc libucimf.pc ucimf_start
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -154,6 +154,7 @@ CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DIALOG = @DIALOG@
 DSYMUTIL = @DSYMUTIL@
 DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
@@ -193,6 +194,8 @@ PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PKG_CONFIG = @PKG_CONFIG@
+PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
+PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 RANLIB = @RANLIB@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
@@ -240,7 +243,6 @@ libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
 localstatedir = @localstatedir@
-lt_ECHO = @lt_ECHO@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
@@ -271,7 +273,7 @@ misc_DATA = ucimf.conf.example
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libucimf.pc #libucimf-uninstalled.pc
 pkgconfig_in_data = libucimf.pc.in #libucimf-uninstalled.pc.in
-EXTRA_DIST = $(bin_SCRIPTS) $(conf_DATA) $(misc_DATA) $(pkgconfig_DATA) $(pkgconfig_in_data)
+EXTRA_DIST = $(bin_SCRIPTS) $(conf_DATA) $(misc_DATA) $(pkgconfig_DATA) $(pkgconfig_in_data) ucimf_start.in
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -330,6 +332,8 @@ distclean-hdr:
 libucimf-uninstalled.pc: $(top_builddir)/config.status $(srcdir)/libucimf-uninstalled.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 libucimf.pc: $(top_builddir)/config.status $(srcdir)/libucimf.pc.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+ucimf_start: $(top_builddir)/config.status $(srcdir)/ucimf_start.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 install-binSCRIPTS: $(bin_SCRIPTS)
 	@$(NORMAL_INSTALL)

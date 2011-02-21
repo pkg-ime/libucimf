@@ -133,7 +133,6 @@ void scanImf()
   UrDEBUG("IMF Modules scan path: %s \n", IMF_MODULE_DIR );
  
   lt_dlinit();
-  lt_dlsetsearchpath( IMF_MODULE_DIR );
 
   DIR *dir = opendir( IMF_MODULE_DIR );
   if( dir )
@@ -143,6 +142,7 @@ void scanImf()
     {
       if( strstr( d_ent->d_name, ".so") )
       {
+	  lt_dlsetsearchpath( IMF_MODULE_DIR );
 	  lt_dlhandle handle = lt_dlopen( d_ent->d_name );
 	  if( handle == NULL){
 	    UrDEBUG( "lt_dlopen %s failed\n", d_ent->d_name );
@@ -228,9 +228,9 @@ void ucimf_init()
 
   prev_focus = false;
   imf = 0;
-  cwm->attachWindow( stts->getWindow(), status_shift );
-  cwm->attachWindow( prdt->getWindow(), preedit_shift );
   cwm->attachWindow( lkc->getWindow(), lookupchoice_shift );
+  cwm->attachWindow( prdt->getWindow(), preedit_shift );
+  cwm->attachWindow( stts->getWindow(), status_shift );
   cwm->set_focus( false );
   scanImf();
   imf = imfs[current_imf];
@@ -351,8 +351,8 @@ char* ucimf_process_raw( char *buf, int *p_ret )
 	}
 
 	unsigned short sym = keycode_to_keysym( kc, down );
-	char *str = (char*)malloc( sizeof(char)*128 );
-	str = keysym_to_term_string(sym, down);
+	char str[128];
+	strcpy( str, keysym_to_term_string(sym, down) );
 
 	if( !down )
 	{
