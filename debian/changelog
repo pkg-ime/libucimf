@@ -1,3 +1,17 @@
+libucimf (2.3.8-2) unstable; urgency=low
+
+  * debian/libucimf-dev.install:
+    - Clean the dependency_libs out of .la files at build time,
+      per Policy 10.2 (Closes: #620617).
+  * debian/control:
+    - Move fbterm and jfbterm from Depends to Recommends.
+    - Remove useless ${shlibs:Depends}.
+    + Bump std-ver: 3.9.2.
+  * debian/patches/fix_manpages.patch:
+    - Fix minor problems in manpages.
+
+ -- Aron Xu <happyaron.xu@gmail.com>  Sat, 09 Apr 2011 13:23:16 +0800
+
 libucimf (2.3.8-1) unstable; urgency=low
 
   * New upstream release:

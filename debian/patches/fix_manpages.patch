@@ -1,0 +1,108 @@
+Description: Fix problems in manpages
+Author: Aron Xu <happyaron.xu@gmail.com>
+Last-Update: 2011-04-09
+--- a/man/ucimf.1
++++ b/man/ucimf.1
+@@ -21,7 +21,7 @@
+ \fBucimf\fP is an input method framework designed for Linux unicode console.
+ .PP
+ .SH FEATURE
+- • Support UTF-8 
++ • Support UTF\-8 
+ .br
+  • Support OpenVanilla Modules
+ .br
+@@ -43,13 +43,13 @@
+ .PP
+ 
+ .SH USAGE
+-\fBucimf\fP needs to run under an UTF-8 consle environment, please 
+-use \fBlocale -a\fP to see the UTF-8 locales that your system is supported 
+-and use command like \fBexport LC_ALL=zh_CN.UTF-8\fP to set up the locale.
+-.PP
+-To start ucimf with FbTerm, prefer to install \fBfbterm-ucimf\fP package and 
+-run \fIfbterm -i fbterm_ucimf\fP, or see \fBucimf_start(1)\fP as an 
+-not-recommended alternate.
++\fBucimf\fP needs to run under an UTF\-8 consle environment, please 
++use \fBlocale \-a\fP to see the UTF\-8 locales that your system is supported 
++and use command like \fBexport LC_ALL=zh_CN.UTF\-8\fP to set up the locale.
++.PP
++To start ucimf with FbTerm, prefer to install \fBfbterm\-ucimf\fP package and 
++run \fIfbterm \-i fbterm_ucimf\fP, or see \fBucimf_start(1)\fP as an 
++not\-recommended alternate.
+ .PP
+ When the user is running an \fIFbTerm\fP, key combination \fBCtrl+Space\fP is 
+ the switch of enable/disable the input method, \fBCtrl+ShiftLeft\fP to 
+@@ -66,7 +66,7 @@
+ .PP
+ .SH TABLE MANAGEMENT
+ \fBucimf\fP use standard *.cin files directly to manage its input method 
+-tables, per-user input method tables is put in 
++tables, per\-user input method tables is put in 
+ .br
+ \fI~/.openvanilla/OVIMGeneric/\fP.
+ .PP
+@@ -79,12 +79,12 @@
+ .br
+ ucimf will follow this order while loading input method tables.
+ .PP
+-.SH SHELL ENVIROMENT
+-\fBLC_CTYPE\fP - use \fIUTF-8\fP as to recogize characters. For example:
++.SH SHELL ENVIRONMENT
++\fBLC_CTYPE\fP \- use \fIUTF-8\fP as to recogize characters. For example:
+ .br
+ \fIexport LC_CTYPE=zh_CN.UTF-8\fP
+ .PP
+-\fBOVMODULE_DIR\fP - to customize OpenVanilla modules location at run-time. 
++\fBOVMODULE_DIR\fP \- to customize OpenVanilla modules location at run-time. 
+ For example:
+ .br
+ \fIexport OVMODULE_DIR=/usr/lib/openvanilla/\fP
+@@ -99,7 +99,7 @@
+ .BR ucimf.conf (5).
+ .br
+ .SH AUTHOR
+-libucimf was written by Chun-Yu Lee (Mat) <MatLinuxer2@gmail.com> and Jim Huang <jserv.tw@gmail.com>.
++libucimf was written by Chun\-Yu Lee (Mat) <MatLinuxer2@gmail.com> and Jim Huang <jserv.tw@gmail.com>.
+ .PP
+ This manual page was written by Aron Xu <happyaron.xu@gmail.com>,
+ for the Debian project (and may be used by others).
+--- a/man/ucimf.conf.5
++++ b/man/ucimf.conf.5
+@@ -31,7 +31,7 @@
+ .br
+ \fIFONT_HEIGHT = 24\fP
+ .PP
+-Input method framwork modules of UCIMF search path is set by \fBIMF_MODULE_DIR\fP:
++Input method framework modules of UCIMF search path is set by \fBIMF_MODULE_DIR\fP:
+ .br
+ IMF_MODULE_DIR=/usr/lib/ucimf/
+ .PP
+--- a/man/ucimf_start.1
++++ b/man/ucimf_start.1
+@@ -29,12 +29,12 @@
+ because Debian does not install fbterm with setuid by default.
+ .PP
+ setuid to root could probably \fBdo harm to your security\fP, so set it at your 
+-own risk. If you run FbTerm, use \fIfbterm -i fbterm_ucimf\fP to start it 
++own risk. If you run FbTerm, use \fIfbterm \-i fbterm_ucimf\fP to start it 
+ instead.
+ .PP
+-\fBucimf\fP needs to run under an UTF-8 consle environment, please 
+-use \fBlocale -a\fP to see the UTF-8 locales that your system is supported 
+-and use command like \fBexport LC_ALL=zh_CN.UTF-8\fP to set up the locale.
++\fBucimf\fP needs to run under an UTF\-8 consle environment, please 
++use \fBlocale \-a\fP to see the UTF\-8 locales that your system is supported 
++and use command like \fBexport LC_ALL=zh_CN.UTF\-8\fP to set up the locale.
+ .PP
+ .\" TeX users may be more comfortable with the \fB<whatever>\fP and
+ .\" \fI<whatever>\fP escape sequences to invode bold face and italics,
+@@ -45,7 +45,7 @@
+ .BR ucimf.conf (5).
+ .br
+ .SH AUTHOR
+-libucimf was written by Chun-Yu Lee (Mat) <MatLinuxer2@gmail.com> and Jim Huang <jserv.tw@gmail.com>.
++libucimf was written by Chun\-Yu Lee (Mat) <MatLinuxer2@gmail.com> and Jim Huang <jserv.tw@gmail.com>.
+ .PP
+ This manual page was written by Aron Xu <happyaron.xu@gmail.com>,
+ for the Debian project (and may be used by others).
