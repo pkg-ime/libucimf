@@ -99,7 +99,7 @@
 #undef HAVE__BOOL
 
 /* Description */
-#undef LIBDIR
+#undef IMF_MODULE_DIR
 
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */
@@ -133,7 +133,7 @@
 #undef STDC_HEADERS
 
 /* Description */
-#undef SYSCONFDIR
+#undef UCIMF_CONF
 
 #undef USE_DEBUG
 
