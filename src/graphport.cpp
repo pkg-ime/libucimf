@@ -87,12 +87,23 @@ void GraphPort::RevRect( int x, int y, int width, int height)
  //UrDEBUG("GraphPort::RevRect() End()\n");
 }
 
+int GraphPort::Height()
+{
+    if( !gdev ) return 0;
+    return gdev->Height();
+}
+
+int GraphPort::Width()
+{
+    if( !gdev ) return 0;
+    return gdev->Width();
+}
+
 void GraphPort::setPseudo( bool flag)
 {
   if( flag != pseudo && flag == true && win!=0)
   {
-    win->w(0);
-    win->h(0);
+    win->wh(0,0);
   }
   pseudo = flag;
 
