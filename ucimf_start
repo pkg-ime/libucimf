@@ -1,0 +1,296 @@
+#!/bin/bash
+
+UCIMF_DIR="${HOME}/.ucimf/"
+
+UCIMF_CMD="${HOME}/.ucimf/cmd"
+UCIMF_LOCALE="${HOME}/.ucimf/locale"
+UCIMF_TERM="${HOME}/.ucimf/term"
+UCIMF_IME="${HOME}/.ucimf/ime"
+UCIMF_FONT="${HOME}/.ucimf/font"
+UCIMF_FONTSIZE="${HOME}/.ucimf/fontsize"
+
+UCIMF_RC="${HOME}/.ucimfrc"
+
+#
+#  This function is to check environment setting before excution
+# 
+function env_check(){
+	# check ttyname in /dev/tty* or /dev/vc*
+	my_tty="$(ls -l /dev/fd/* )"
+
+	# check /dev/fb/* existence and permission
+	my_fb_perm=$( ls -l /dev/fb* )
+
+	# check framebuffer parameters WxHxColour
+	my_fb_param=$(fbset)
+
+	# check .ucimfrc existed 
+	my_ucimfrc=$(cat ${HOME}/.ucimfrc)
+
+	# check .openvanilla existed
+	my_openvanilla=$( ls -l ${HOME}/.openvanilla )
+
+	# check openvanilla's modules existed
+	my_openvanilla_modules=$( ls -l ${HOME}/.openvanilla/OVIMGeneric )
+
+	echo "===tty listing===" 
+	echo "${my_tty}" 
+	echo "===framebuffer status===" 
+	echo "${my_fb_perm}""${my_fb_param}" 
+	echo "=== ~/.ucimfrc setting ===" 
+	echo "${my_ucimfrc}" 
+	echo "=== ~/.openvanilla/ setting ===" 
+	echo "${my_openvanilla}""${my_openvanilla_modules}" 
+
+
+	echo "main" > $UCIMF_CMD
+}
+
+function main_setup(){
+	dialog --stdout \
+	--title "UCIMF -- Unicode Console InputMethod Framework" \
+	--menu "Enter the setup menu" 20 60 14 \
+	"locale"  "Locale settings" \
+	"term" "Detected console terminal applications" \
+	"ime" "Input Method Engines (IME) setup" \
+	"font" "Fonts Settings" \
+	"env" "Run-time detected environment parameters" \
+	"run" "Save and start to run program" \
+	> $UCIMF_CMD
+}
+
+function save_setup(){
+	echo "" > ${UCIMF_RC}
+        echo "locale=$( cat ${UCIMF_LOCALE})" >> ${UCIMF_RC}
+        echo "term=$( cat ${UCIMF_TERM})" >> ${UCIMF_RC}
+        echo "font-name=$( cat ${UCIMF_FONT})" >> ${UCIMF_RC}
+        echo "font-size=$( cat ${UCIMF_FONTSIZE})" >> ${UCIMF_RC}
+}
+
+function restore_setup(){
+	THE_LOCALE=$( grep "^locale=" ${UCIMF_RC}| cut -d\= -f2 )
+	THE_TERM=$( grep "^term=" ${UCIMF_RC}| cut -d\= -f2 )
+	THE_FONT=$( grep "^font-name=" ${UCIMF_RC}| cut -d\= -f2 )
+	THE_FONTSIZE=$( grep "^font-size=" ${UCIMF_RC}| cut -d\= -f2 )
+
+	echo $THE_LOCALE    >     $UCIMF_LOCALE
+	echo $THE_TERM      >     $UCIMF_TERM
+	echo $THE_FONT      >     $UCIMF_FONT
+	echo $THE_FONTSIZE  >     $UCIMF_FONTSIZE
+}
+
+
+function locale_setup(){
+       my_locale=$(cat ${UCIMF_LOCALE})
+
+       # Check locale settings
+       lcs=$(locale -a|grep -i utf*8)
+
+       lcs_menu=""
+
+       if [ "x$my_locale" != "x" ]
+       then 
+	   lcs_menu="$my_locale Current_locale_setting"
+       fi
+
+       for lc in $lcs
+       do
+       lcs_menu="$lcs_menu $lc $lc"
+       done
+
+       dialog --stdout --title "Locale settings" --menu "Select the locale:" 20 60 14 $lcs_menu > $UCIMF_LOCALE
+}
+
+function term_setup(){
+	my_term=$(cat ${UCIMF_TERM} )
+
+	terms_menu=""
+	if [ "x$my_term" != "x" ]
+	then 
+	    terms_menu="$my_term Current_terminal_setting"
+        fi
+
+
+	bin_jfbterm=$(which jfbterm 2>/dev/null )
+	if [ $? == 0 ]
+	then 
+	    ucimf_ldd =$( ldd ${bin_jfbterm} )
+	    if [ "x$ucimf_ldd" != "x" ]
+	    then
+	    terms_menu="${terms_menu} jfbterm jfbterm J Framebuffer terminal"
+	    fi
+        fi
+
+	bin_fbterm=$(which fbterm 2>/dev/null )
+	if [ $? == 0 ]
+	then 
+	    ucimf_ldd=$( ldd ${bin_fbterm} )
+	    ucimf_rev=$( fbterm -V| grep '1.3' )
+	    if [ "x$ucimf_ldd" != "x" ]
+	    then
+	    terms_menu="${terms_menu} fbterm FbTerm" 
+	    fi
+        fi
+	        
+	echo $terms_menu
+
+	dialog --stdout --title "Detected console terminal applications" --menu "Select the application:" 20 60 14 $terms_menu > $UCIMF_TERM
+}
+
+ime_setup(){
+	my_imes=$(cat ${UCIMF_TERM} )
+
+	imes_menu=""
+
+	sys_imes_dir="/usr/lib/openvanilla/OVIMGeneric/"
+	imes=$( test -d $sys_imes_dir && cd $sys_imes_dir && ls *.cin)
+
+	my_imes_dir="${HOME}/.openvanilla/OVIMGeneric/"
+	test -d ${HOME} || mkdir -p "${HOME}/.openvanilla"
+	test -d ${my_imes_dir} || mkdir -p "$my_imes_dir"
+	imes2=$( test -d $my_imes_dir && cd $my_imes_dir && ls *.cin)
+	imes3=$( test -d $my_imes_dir && cd $my_imes_dir && ls *.cin.off )
+
+        for ime in $imes2 
+        do
+            imes_menu="$imes_menu $ime $ime on"
+        done
+
+        for ime in $imes3 
+        do
+            imes_menu="$imes_menu ${ime%.off} ${ime%.off} off"
+        done
+
+        for ime in $imes 
+        do
+	    if ! [ -f $my_imes_dir/$ime ]
+	    then
+		    imes_menu="$imes_menu $ime $ime off"
+	    fi
+        done
+
+	echo $imes_menu
+
+	dialog --stdout --title "Input Method Engines(IME) Setup" --checklist "Select toggle referred IME:" 20 60 14 $imes_menu > $UCIMF_IME
+
+	for ime_str in $( cat $UCIMF_IME )
+	do  
+	    ime_str2="${ime_str/\"/}"
+	    ime="${ime_str2/\"/}"
+	    if ! [ "${imes2/$ime/}" = "${imes2}" ]
+	    then
+	       echo "$ime was on"
+	    elif ! [ "${imes3/$ime.off/}" = "${imes3}" ]
+	    then 
+	       echo "$ime turns on"
+	       mv -v $my_imes_dir/${ime}.off $my_imes_dir/${ime}
+	    elif ! [ "${imes/$ime/}" = "${imes}" ]
+	    then
+	       echo "$ime copy and turns on"
+	       cp -v $sys_imes_dir/$ime $my_imes_dir/$ime
+            fi
+	done
+	
+	imes4=$(cat $UCIMF_IME )
+	for ime in $imes2
+	do
+	    if [ "${imes4/$ime/}" = "${imes4}" ]
+	    then
+	        echo "$ime turns off"
+	        mv -v $my_imes_dir/${ime} $my_imes_dir/${ime}.off
+	    fi
+	done
+
+	sleep 3
+}
+
+font_setup(){
+	fonts_menu=""
+
+	fonts=$(fc-list | sed s/\ /_/g| cut -d: -f1| cut -d, -f1)
+
+        for font in $fonts
+        do
+            fonts_menu="$fonts_menu $font $font off"
+        done
+
+	echo $fonts_menu
+
+	dialog --stdout --title "Fonts Setup" --radiolist "Select the font:" 20 60 14 $fonts_menu | sed s/_/\ /g > $UCIMF_FONT
+}
+
+
+# 先檢查檔案跟目錄是否存在
+test -d ${UCIMF_DIR} || mkdir -p ${UCIMF_DIR}
+test -f ${UCIMF_CMD} || touch ${UCIMF_CMD}
+test -f ${UCIMF_LOCALE} || touch ${UCIMF_LOCALE}
+test -f ${UCIMF_TERM} || touch ${UCIMF_TERM}
+test -f ${UCIMF_IME} || touch ${UCIMF_IME}
+test -f ${UCIMF_FONT} || touch ${UCIMF_FONT}
+test -f ${UCIMF_FONTSIZE} || touch ${UCIMF_FONTSIZE}
+test -f ${UCIMF_RC} || touch ${UCIMF_RC}
+
+# 讀取目前的設定
+restore_setup
+
+# 進入主選單
+echo "main" > $UCIMF_CMD
+
+# 對話式選單的主程式
+while true
+do
+  CMD=$(cat ${UCIMF_CMD})
+  
+  case $CMD in
+    main)
+      echo "main" > $UCIMF_CMD # 回主選單
+      main_setup
+      ;;
+    run)
+      save_setup
+      THE_LOCALE=$( grep "^locale=" ${UCIMF_RC}| cut -d\= -f2 )
+      THE_TERM=$( grep "^term=" ${UCIMF_RC}| cut -d\= -f2 )
+      THE_FONT=$( grep "^font-name=" ${UCIMF_RC}| cut -d\= -f2 )
+      THE_FONTSIZE=$( grep "^font-size=" ${UCIMF_RC}| cut -d\= -f2 )
+
+      if [ $THE_TERM == "fbterm" ]
+      then
+	      LC_CTYPE="$THE_LOCALE" $THE_TERM -i fbterm_ucimf 2>/dev/null
+      else
+	      LC_CTYPE="$THE_LOCALE" $THE_TERM 2>/dev/null
+      fi
+
+      # 理想的啟動設定
+      # LC_CTYPE="$THE_LOCALE" fbterm --input-method=fbterm_ucimf --font-names="$THE_FONT" --font-size=$THE_FONTSIZE 2>/dev/null
+      
+      exit 0
+      ;;
+    env)
+      echo "main" > $UCIMF_CMD # 回主選單
+      env_check
+      ;;
+    locale)
+      echo "main" > $UCIMF_CMD # 回主選單
+      locale_setup
+      ;;
+    term)
+      echo "main" > $UCIMF_CMD # 回主選單
+      term_setup
+      ;;
+    ime)
+      echo "main" > $UCIMF_CMD # 回主選單
+      ime_setup
+      ;;
+    font)
+      echo "main" > $UCIMF_CMD # 回主選單
+      font_setup
+      ;;
+    fontsize)
+      echo "main" > $UCIMF_CMD # 回主選單
+      fontsize_setup
+      ;;
+    *)
+      exit 0
+      ;;
+  esac
+done
