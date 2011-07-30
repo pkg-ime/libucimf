@@ -28,6 +28,7 @@
 #include <iconv.h>
 #include "font.h"
 #include <stdint.h>
+#include <string.h>
 
 ustring::ustring(const char* encoding, const char* data)
 {
@@ -116,23 +117,4 @@ bool ustring::operator==(const ustring& ustr) const
     return true;
   
   return false;
-}
-
-int ustring::length() const
-{
-  if( udata.empty() )
-  {
-    return 0;
-  }
-
-  Font* font= Font::getInstance();
-  int result = 0;
-
-  for( size_t i=0; i< udata.size(); i++ )
-  {
-    result += font->length( udata[i] );
-  }
-
-  return result;
-
 }

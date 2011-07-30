@@ -15,6 +15,7 @@
 
 @SET_MAKE@
 
+
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
@@ -34,7 +35,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-subdir = display
+noinst_PROGRAMS = font-c$(EXEEXT) font-cpp$(EXEEXT)
+subdir = font
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -45,14 +47,17 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-libdisplay_la_LIBADD =
-am_libdisplay_la_OBJECTS = libdisplay_la-graphdev.lo \
-	libdisplay_la-fbdev.lo libdisplay_la-fblinear15.lo \
-	libdisplay_la-fblinear16.lo libdisplay_la-fblinear24.lo \
-	libdisplay_la-fblinear32.lo libdisplay_la-fblinear4.lo \
-	libdisplay_la-fblinear8.lo libdisplay_la-fbvgaplanes.lo \
-	libdisplay_la-lrmi.lo libdisplay_la-vgadev.lo
-libdisplay_la_OBJECTS = $(am_libdisplay_la_OBJECTS)
+am__DEPENDENCIES_1 =
+libfont_la_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+am_libfont_la_OBJECTS = libfont_la-font.lo
+libfont_la_OBJECTS = $(am_libfont_la_OBJECTS)
+PROGRAMS = $(noinst_PROGRAMS)
+am_font_c_OBJECTS = main-c.$(OBJEXT)
+font_c_OBJECTS = $(am_font_c_OBJECTS)
+font_c_DEPENDENCIES = libfont.la
+am_font_cpp_OBJECTS = main-cpp.$(OBJEXT)
+font_cpp_OBJECTS = $(am_font_cpp_OBJECTS)
+font_cpp_DEPENDENCIES = libfont.la
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -75,8 +80,9 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(libdisplay_la_SOURCES)
-DIST_SOURCES = $(libdisplay_la_SOURCES)
+SOURCES = $(libfont_la_SOURCES) $(font_c_SOURCES) $(font_cpp_SOURCES)
+DIST_SOURCES = $(libfont_la_SOURCES) $(font_c_SOURCES) \
+	$(font_cpp_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -201,11 +207,14 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-noinst_LTLIBRARIES = libdisplay.la
-libdisplay_la_SOURCES = graphdev.h graphdev.cpp fbdev.cpp fblinear15.cpp fblinear16.cpp fblinear24.cpp fblinear32.cpp fblinear4.cpp fblinear8.cpp fbvgaplanes.cpp lrmi.c vgadev.cpp \
-                       fbdev.h fblinear15.h fblinear16.h fblinear24.h fblinear32.h fblinear4.h fblinear8.h fbvgaplanes.h lrmi.h vgadev.h
-
-libdisplay_la_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/font -fPIC
+noinst_LTLIBRARIES = libfont.la
+libfont_la_SOURCES = font.h font.cpp 
+libfont_la_CPPFLAGS = $(freetype2_CFLAGS) $(fontconfig_CFLAGS) -fPIC 
+libfont_la_LIBADD = $(freetype2_LIBS) $(fontconfig_LIBS) 
+font_c_SOURCES = main-c.c 
+font_c_LDADD = libfont.la -lstdc++
+font_cpp_SOURCES = main-cpp.cpp
+font_cpp_LDADD = libfont.la 
 all: all-am
 
 .SUFFIXES:
@@ -219,9 +228,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu display/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu font/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu display/Makefile
+	  $(AUTOMAKE) --gnu font/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -249,8 +258,23 @@ clean-noinstLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-libdisplay.la: $(libdisplay_la_OBJECTS) $(libdisplay_la_DEPENDENCIES) 
-	$(CXXLINK)  $(libdisplay_la_OBJECTS) $(libdisplay_la_LIBADD) $(LIBS)
+libfont.la: $(libfont_la_OBJECTS) $(libfont_la_DEPENDENCIES) 
+	$(CXXLINK)  $(libfont_la_OBJECTS) $(libfont_la_LIBADD) $(LIBS)
+
+clean-noinstPROGRAMS:
+	@list='$(noinst_PROGRAMS)'; test -n "$$list" || exit 0; \
+	echo " rm -f" $$list; \
+	rm -f $$list || exit $$?; \
+	test -n "$(EXEEXT)" || exit 0; \
+	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
+	echo " rm -f" $$list; \
+	rm -f $$list
+font-c$(EXEEXT): $(font_c_OBJECTS) $(font_c_DEPENDENCIES) 
+	@rm -f font-c$(EXEEXT)
+	$(LINK) $(font_c_OBJECTS) $(font_c_LDADD) $(LIBS)
+font-cpp$(EXEEXT): $(font_cpp_OBJECTS) $(font_cpp_DEPENDENCIES) 
+	@rm -f font-cpp$(EXEEXT)
+	$(CXXLINK) $(font_cpp_OBJECTS) $(font_cpp_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -258,17 +282,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdisplay_la-fbdev.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdisplay_la-fblinear15.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdisplay_la-fblinear16.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdisplay_la-fblinear24.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdisplay_la-fblinear32.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdisplay_la-fblinear4.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdisplay_la-fblinear8.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdisplay_la-fbvgaplanes.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdisplay_la-graphdev.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdisplay_la-lrmi.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdisplay_la-vgadev.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libfont_la-font.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main-c.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main-cpp.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -291,13 +307,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
-libdisplay_la-lrmi.lo: lrmi.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdisplay_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdisplay_la-lrmi.lo -MD -MP -MF $(DEPDIR)/libdisplay_la-lrmi.Tpo -c -o libdisplay_la-lrmi.lo `test -f 'lrmi.c' || echo '$(srcdir)/'`lrmi.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdisplay_la-lrmi.Tpo $(DEPDIR)/libdisplay_la-lrmi.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lrmi.c' object='libdisplay_la-lrmi.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdisplay_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdisplay_la-lrmi.lo `test -f 'lrmi.c' || echo '$(srcdir)/'`lrmi.c
-
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
@@ -319,75 +328,12 @@ libdisplay_la-lrmi.lo: lrmi.c
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
 
-libdisplay_la-graphdev.lo: graphdev.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdisplay_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libdisplay_la-graphdev.lo -MD -MP -MF $(DEPDIR)/libdisplay_la-graphdev.Tpo -c -o libdisplay_la-graphdev.lo `test -f 'graphdev.cpp' || echo '$(srcdir)/'`graphdev.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libdisplay_la-graphdev.Tpo $(DEPDIR)/libdisplay_la-graphdev.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='graphdev.cpp' object='libdisplay_la-graphdev.lo' libtool=yes @AMDEPBACKSLASH@
+libfont_la-font.lo: font.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libfont_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libfont_la-font.lo -MD -MP -MF $(DEPDIR)/libfont_la-font.Tpo -c -o libfont_la-font.lo `test -f 'font.cpp' || echo '$(srcdir)/'`font.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libfont_la-font.Tpo $(DEPDIR)/libfont_la-font.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='font.cpp' object='libfont_la-font.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdisplay_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libdisplay_la-graphdev.lo `test -f 'graphdev.cpp' || echo '$(srcdir)/'`graphdev.cpp
-
-libdisplay_la-fbdev.lo: fbdev.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdisplay_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libdisplay_la-fbdev.lo -MD -MP -MF $(DEPDIR)/libdisplay_la-fbdev.Tpo -c -o libdisplay_la-fbdev.lo `test -f 'fbdev.cpp' || echo '$(srcdir)/'`fbdev.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libdisplay_la-fbdev.Tpo $(DEPDIR)/libdisplay_la-fbdev.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fbdev.cpp' object='libdisplay_la-fbdev.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdisplay_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libdisplay_la-fbdev.lo `test -f 'fbdev.cpp' || echo '$(srcdir)/'`fbdev.cpp
-
-libdisplay_la-fblinear15.lo: fblinear15.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdisplay_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libdisplay_la-fblinear15.lo -MD -MP -MF $(DEPDIR)/libdisplay_la-fblinear15.Tpo -c -o libdisplay_la-fblinear15.lo `test -f 'fblinear15.cpp' || echo '$(srcdir)/'`fblinear15.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libdisplay_la-fblinear15.Tpo $(DEPDIR)/libdisplay_la-fblinear15.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fblinear15.cpp' object='libdisplay_la-fblinear15.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdisplay_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libdisplay_la-fblinear15.lo `test -f 'fblinear15.cpp' || echo '$(srcdir)/'`fblinear15.cpp
-
-libdisplay_la-fblinear16.lo: fblinear16.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdisplay_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libdisplay_la-fblinear16.lo -MD -MP -MF $(DEPDIR)/libdisplay_la-fblinear16.Tpo -c -o libdisplay_la-fblinear16.lo `test -f 'fblinear16.cpp' || echo '$(srcdir)/'`fblinear16.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libdisplay_la-fblinear16.Tpo $(DEPDIR)/libdisplay_la-fblinear16.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fblinear16.cpp' object='libdisplay_la-fblinear16.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdisplay_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libdisplay_la-fblinear16.lo `test -f 'fblinear16.cpp' || echo '$(srcdir)/'`fblinear16.cpp
-
-libdisplay_la-fblinear24.lo: fblinear24.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdisplay_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libdisplay_la-fblinear24.lo -MD -MP -MF $(DEPDIR)/libdisplay_la-fblinear24.Tpo -c -o libdisplay_la-fblinear24.lo `test -f 'fblinear24.cpp' || echo '$(srcdir)/'`fblinear24.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libdisplay_la-fblinear24.Tpo $(DEPDIR)/libdisplay_la-fblinear24.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fblinear24.cpp' object='libdisplay_la-fblinear24.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdisplay_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libdisplay_la-fblinear24.lo `test -f 'fblinear24.cpp' || echo '$(srcdir)/'`fblinear24.cpp
-
-libdisplay_la-fblinear32.lo: fblinear32.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdisplay_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libdisplay_la-fblinear32.lo -MD -MP -MF $(DEPDIR)/libdisplay_la-fblinear32.Tpo -c -o libdisplay_la-fblinear32.lo `test -f 'fblinear32.cpp' || echo '$(srcdir)/'`fblinear32.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libdisplay_la-fblinear32.Tpo $(DEPDIR)/libdisplay_la-fblinear32.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fblinear32.cpp' object='libdisplay_la-fblinear32.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdisplay_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libdisplay_la-fblinear32.lo `test -f 'fblinear32.cpp' || echo '$(srcdir)/'`fblinear32.cpp
-
-libdisplay_la-fblinear4.lo: fblinear4.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdisplay_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libdisplay_la-fblinear4.lo -MD -MP -MF $(DEPDIR)/libdisplay_la-fblinear4.Tpo -c -o libdisplay_la-fblinear4.lo `test -f 'fblinear4.cpp' || echo '$(srcdir)/'`fblinear4.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libdisplay_la-fblinear4.Tpo $(DEPDIR)/libdisplay_la-fblinear4.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fblinear4.cpp' object='libdisplay_la-fblinear4.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdisplay_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libdisplay_la-fblinear4.lo `test -f 'fblinear4.cpp' || echo '$(srcdir)/'`fblinear4.cpp
-
-libdisplay_la-fblinear8.lo: fblinear8.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdisplay_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libdisplay_la-fblinear8.lo -MD -MP -MF $(DEPDIR)/libdisplay_la-fblinear8.Tpo -c -o libdisplay_la-fblinear8.lo `test -f 'fblinear8.cpp' || echo '$(srcdir)/'`fblinear8.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libdisplay_la-fblinear8.Tpo $(DEPDIR)/libdisplay_la-fblinear8.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fblinear8.cpp' object='libdisplay_la-fblinear8.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdisplay_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libdisplay_la-fblinear8.lo `test -f 'fblinear8.cpp' || echo '$(srcdir)/'`fblinear8.cpp
-
-libdisplay_la-fbvgaplanes.lo: fbvgaplanes.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdisplay_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libdisplay_la-fbvgaplanes.lo -MD -MP -MF $(DEPDIR)/libdisplay_la-fbvgaplanes.Tpo -c -o libdisplay_la-fbvgaplanes.lo `test -f 'fbvgaplanes.cpp' || echo '$(srcdir)/'`fbvgaplanes.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libdisplay_la-fbvgaplanes.Tpo $(DEPDIR)/libdisplay_la-fbvgaplanes.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='fbvgaplanes.cpp' object='libdisplay_la-fbvgaplanes.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdisplay_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libdisplay_la-fbvgaplanes.lo `test -f 'fbvgaplanes.cpp' || echo '$(srcdir)/'`fbvgaplanes.cpp
-
-libdisplay_la-vgadev.lo: vgadev.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdisplay_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libdisplay_la-vgadev.lo -MD -MP -MF $(DEPDIR)/libdisplay_la-vgadev.Tpo -c -o libdisplay_la-vgadev.lo `test -f 'vgadev.cpp' || echo '$(srcdir)/'`vgadev.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libdisplay_la-vgadev.Tpo $(DEPDIR)/libdisplay_la-vgadev.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='vgadev.cpp' object='libdisplay_la-vgadev.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdisplay_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libdisplay_la-vgadev.lo `test -f 'vgadev.cpp' || echo '$(srcdir)/'`vgadev.cpp
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libfont_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libfont_la-font.lo `test -f 'font.cpp' || echo '$(srcdir)/'`font.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -479,7 +425,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LTLIBRARIES)
+all-am: Makefile $(LTLIBRARIES) $(PROGRAMS)
 installdirs:
 install: install-am
 install-exec: install-exec-am
@@ -509,7 +455,7 @@ maintainer-clean-generic:
 clean: clean-am
 
 clean-am: clean-generic clean-libtool clean-noinstLTLIBRARIES \
-	mostlyclean-am
+	clean-noinstPROGRAMS mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -580,17 +526,18 @@ uninstall-am:
 .MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-libtool clean-noinstLTLIBRARIES ctags distclean \
-	distclean-compile distclean-generic distclean-libtool \
-	distclean-tags distdir dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am install-man \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	pdf pdf-am ps ps-am tags uninstall uninstall-am
+	clean-libtool clean-noinstLTLIBRARIES clean-noinstPROGRAMS \
+	ctags distclean distclean-compile distclean-generic \
+	distclean-libtool distclean-tags distdir dvi dvi-am html \
+	html-am info info-am install install-am install-data \
+	install-data-am install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-man install-pdf install-pdf-am \
+	install-ps install-ps-am install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags uninstall uninstall-am
 
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

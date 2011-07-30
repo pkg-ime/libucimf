@@ -27,59 +27,26 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <assert.h>
+#include <stdlib.h>
 
-#include "display/fbdev.h"
-#include "display/vgadev.h"
-#if defined(linux) || defined(__FreeBSD__)
-    #ifdef HAVE_GGI_LIB
-    #include "display/libggi.h"
-    #endif
-#endif
+#include "fbdev.h"
+#include "vgadev.h"
 
 #include "font.h"
 
 // mmap framebuffer address
 GraphDev *GraphDev::mpGraphDev = NULL;
-
-// font
 int GraphDev::mXres = 0;
 int GraphDev::mYres = 0;
 
-Font* font = Font::getInstance();
-
-// char display
-int GraphDev::mBlockWidth = font->Width();
-int GraphDev::mBlockHeight = font->Height();
-int GraphDev::mBlankLineHeight = 0;
 
 bool GraphDev::Open() {
-#ifdef HAVE_GGI_LIB
-    #ifndef NDEBUG
-    //try libggi first for debug
-    char *ggiDriveName = getenv("GGI_DISPLAY");
-    if (ggiDriveName) {
-        if (LIBGGI::TryOpen(ggiDriveName))
-            return true;
-        throw(runtime_error("ggi open error, check env GGI_DISPLAY!"));
-    }
-    #endif
-#endif
     //first try fbdev
     OPEN_RC rc = FBDev::TryOpen();
     switch (rc) {
         case NORMAL:
             return true;
         case UNSUPPORT:
-#ifdef HAVE_GGI_LIB
-            //try libggi
-            {
-            char *ggiDriveName = getenv("GGI_DISPLAY");
-            if (ggiDriveName)
-                if (LIBGGI::TryOpen(ggiDriveName))
-                    return true;
-            }
-#endif
-            //libggi failed,now try vga
         case FAILURE:
 #if defined(linux)
 #ifdef USING_VGA
@@ -159,65 +126,35 @@ void GraphDev::DrawRect(int x1,int y1,int x2,int y2,int color) {
 }
 
 int GraphDev::OutChar(int x, int y, int fg, int bg, unsigned int c) {
-    assert( x >= 0 && x + font->Width() <= Width()
-            && y >=0 && y + font->Height() <= Height());
-    CharBitMap tmpFont;
-    font->render(c, tmpFont);
-    
-    int FH = font->Height();
-    int fh = tmpFont.h;
-    int fw = tmpFont.w;
-    int wbytes = tmpFont.wBytes;
-    int i,j;
+    Font* font = Font::instance();
+    assert( x >= 0 && x + font->width() <= Width()
+            && y >=0 && y + font->height() <= Height());
+    // CharBitMap tmpFont;
+    // font->render(c, tmpFont);
+    Font::Glyph *glyph = font->getGlyph( c );
 
-    for (i = 0; i < fh ; i++)
-    {
-      for (j = 0; j < fw ; j++)
-      {
-	unsigned char bmask=0;
-	
-	switch( j%8 )
-	{
-	  case 0:
-	    bmask = 128;
-	    break;
-	  case 1:
-	    bmask = 64;
-	    break;
-	  case 2:
-	    bmask = 32;
-	    break;
-	  case 3:
-	    bmask = 16;
-	    break;
-	  case 4:
-	    bmask = 8;
-	    break;
-	  case 5:
-	    bmask = 4;
-	    break;
-	  case 6:
-	    bmask = 2;
-	    break;
-	  case 7:
-	    bmask = 1;
-	    break;
-	  default:
-	    // should never happen.
-	    break;
-	}
-	
-        if( tmpFont.pBuf[ i*wbytes + j/8 ] & bmask )
-	{
-	  PutPixel( x+j, y+i+FH-fh-1, fg);
-	}
-	else
-	{
-	  PutPixel( x+j, y+i+FH-fh-1, bg);
-	}
-      }
+    if( !glyph ){
+	    return x + font->width(); 
     }
+    
+    int font_height = glyph->height;
+    //int font_width = glyph->width;
+    int font_width = glyph->pitch;
+    int left = glyph->left;
+    int top = glyph->top;
+    int xi, yi;
 
-    return x+fw;
+    for ( yi = 0; yi < font_height; yi++)
+    {  
+	    for ( xi = 0; xi < font_width; xi++ )
+	    {  
+		    if ( glyph->pixmap[ (yi*font_width) + xi ] ){
+			    PutPixel( x+xi, (y+top)+yi, fg);
+		    }
+	    }  
+    } 
 
+    int delta = font_width > font->width()/2 ? font_width : font->width()/2 ;
+
+    return x+delta+left;
 }
