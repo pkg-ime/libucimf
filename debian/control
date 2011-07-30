@@ -2,13 +2,13 @@ Source: libucimf
 Section: utils
 Priority: optional
 Maintainer: IME Packaging Team <pkg-ime-devel@lists.alioth.debian.org>
-Uploaders: Aron Xu <happyaron.xu@gmail.com>
+Uploaders: Aron Xu <aron@debian.org>
 DM-Upload-Allowed: yes
 Build-Depends: debhelper (>= 7.0.50~), autotools-dev, libncurses5-dev, libltdl-dev, libfreetype6-dev, libmagic-dev, pkg-config, libfontconfig1-dev
 Standards-Version: 3.9.2
 Homepage: http://code.google.com/p/ucimf
-Vcs-Bzr: lp:~pkg-ime/ucimf/debian-libucimf
-Vcs-Browser: http://bazaar.launchpad.net/~pkg-ime/ucimf/debian-libucimf
+Vcs-Git: git://anonscm.debian.org/pkg-ime/libucimf.git
+Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-ime/libucimf.git
 
 Package: ucimf
 Architecture: any

@@ -1,3 +1,10 @@
+libucimf (2.3.8-3) unstable; urgency=low
+
+  * debian/rules:
+    - Wipe out unneeded .la file.
+
+ -- Aron Xu <aron@debian.org>  Sat, 30 Jul 2011 15:27:06 +0800
+
 libucimf (2.3.8-2) unstable; urgency=low
 
   * debian/libucimf-dev.install:
